@@ -2,10 +2,14 @@ class Game
 
   attr_accessor :board, :player_1, :player_2
 
+  @@total_wins = 0
+
   def initialize(player_1 = Players::Human.new("X"), player_2 = Players::Human.new("O"), board = Board.new)
     @player_1 = player_1
     @player_2 = player_2
     @board = board
+    @player_1.board = board
+    @player_2.board = board
   end
 
   WIN_COMBINATIONS = [
@@ -51,14 +55,63 @@ class Game
       turn
     end
   end
+
   def play
     while over? == false
       turn
     end
     if won?
+      @@total_wins += 1
       puts "Congratulations #{winner}!"
     else
       puts "Cat's Game!"
     end
   end
+
+  def self.start
+    puts "Welcome!"
+    puts "How many players?"
+    puts "0, 1 or 2?"
+      player_count = gets.strip
+    puts "Who will start? X or O?"
+      token = gets.strip
+
+    if token.upcase == "X"
+      player_1_token = "X"
+      player_2_token = "O"
+    else
+      player_1_token = "O"
+      player_2_token = "X"
+    end
+    case player_count
+    when "0"
+      player_1 = Players::Computer.new(player_1_token)
+      player_2 = Players::Computer.new(player_2_token)
+    when "1"
+      player_1 = Players::Human.new(player_1_token)
+      player_2 = Players::Computer.new(player_2_token)
+    when "2"
+      player_1 = Players::Human.new(player_1_token)
+      player_2 = Players::Human.new(player_2_token)
+    when "wargames"
+      player_1 = Players::Computer.new(player_1_token)
+      player_2 = Players::Computer.new(player_2_token)
+      attempts = 100
+      @@total_wins = 0
+      attempts.times {Game.new(player_1, player_2).play}
+      puts "#{@@total_wins} winners in #{attempts} games..."
+      return
+    end
+    game = Game.new(player_1, player_2)
+    game.play
+
+    puts "Would you like to play again? Y or N"
+    again = gets.strip
+    if again.upcase == "Y"
+      Game.start
+    else
+      puts "Thanks, peace out!"
+    end
+  end
+
 end

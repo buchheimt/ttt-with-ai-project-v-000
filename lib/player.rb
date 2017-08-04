@@ -1,5 +1,6 @@
 class Player
 
+  attr_accessor :board
   attr_reader :token
 
 
